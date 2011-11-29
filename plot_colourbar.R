@@ -1,12 +1,12 @@
 `plot_colourbar` <-
   function (x, ...){
-    UseMethod("plot_colourbar")
+    UseMethod('plot_colourbar')
   }
 
 `plot_colourbar.default` <-
-  function(levs, cols, side=1, ylab="", labels=NULL,
-           xlab="", nn=1, center=F, cex.axis=1,
-           sea.col=NULL, eng=F, ...){
+  function(levs, cols, side=1, ylab='', labels=NULL,
+           xlab='', nn=1, center=FALSE, cex.axis=1,
+           sea.col=NULL, eng=FALSE, ...){
     # plots a colour bar given the levs and cols
     # centers the axis labelling instead of at the
     # boundary when center==TRUE
@@ -25,11 +25,11 @@
     }
 
     if (side %in% c(1,3)){
-      image(1:ncols, 1, lev.arr, axes=F, breaks=1:(ncols+1)-0.5, col=cols,
+      image(1:ncols, 1, lev.arr, axes=FALSE, breaks=1:(ncols+1)-0.5, col=cols,
             ylab=ylab, xlab=xlab, ...)
       abline(v=1:(ncols-1) + 0.5)
     } else {
-      image(1, 1:ncols, lev.arr, axes=F, breaks=1:(ncols+1)-0.5, col=cols,
+      image(1, 1:ncols, lev.arr, axes=FALSE, breaks=1:(ncols+1)-0.5, col=cols,
             ylab=ylab, xlab=xlab, ...)
       abline(h=1:(ncols-1) + 0.5)
     }
@@ -38,7 +38,7 @@
       if (is.null(labels)){
         labels <- (levs[1:(ncols-sea.add)] + levs[2:(ncols+1-sea.add)])/2
       }
-      axis(side, at=at.lev, labels=labels, las=1, tick=F, cex.axis=cex.axis)
+      axis(side, at=at.lev, labels=labels, las=1, tick=FALSE, cex.axis=cex.axis)
     } else {
       at.lev  <- seq(2+sea.add,ncols,nn)
       if (is.null(labels)){
@@ -48,19 +48,19 @@
     }
     if (!is.null(sea.col)){
       if (eng){
-        sea.lang <- ("water")
+        sea.lang <- ('water')
       } else {
-        sea.lang <- ("Wasser")
+        sea.lang <- ('Wasser')
       }
-      axis(side, at=1, labels=sea.lang, las=1, tick=F, cex.axis=cex.axis)
+      axis(side, at=1, labels=sea.lang, las=1, tick=FALSE, cex.axis=cex.axis)
     }
     box()
   }
 
 
 `plot_colourbar.plotmap` <-
-  function(x, incl.units=T, side=1, cex.axis=1,
-           center=F, labels=NULL, mylongname=NULL,...){
+  function(x, incl.units=TRUE, side=1, cex.axis=1,
+           center=FALSE, labels=NULL, mylongname=NULL,...){
     if (!is.null(x$flag_values)){
       center  <- TRUE
       labels  <- x$flag_values
@@ -77,19 +77,19 @@
       if (!is.null(mylongname)) {
         x$longname <- mylongname
       }
-      if (!is.null(x$longname) & !x$longname == "") {
+      if (!is.null(x$longname) & !x$longname == '') {
         if (!is.null(x$units)){
-          unit.string <- paste(x$longname," (",x$units, ")", sep="")
+          unit.string <- paste(x$longname,' (',x$units, ')', sep='')
         } else {
           unit.string <- x$longname
         }
         nlev    <- length(x$lev)
         axis(side, at=nlev/2, labels=unit.string,
-             tick=F, las=1, line=2, cex.axis=cex.axis)
+             tick=FALSE, las=1, line=2, cex.axis=cex.axis)
       } else {
         if (!is.null(x$units)){
           axis(side, at=length(x$lev)-0.9, labels=x$units,
-               tick=F, las=1, cex.axis=cex.axis)
+               tick=FALSE, las=1, cex.axis=cex.axis)
         }
       }
     }

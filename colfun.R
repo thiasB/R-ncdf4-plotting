@@ -114,7 +114,7 @@
 .redwhite   <- .data[17:9,]
 .greenwhite <- .data[17:9,c(2,1,3)]
 .brownwhite <- .data[1:9,c(3,2,1)]
-.water        <- "#7caaff"
+.water        <- '#7caaff'
 
 rm(.data)
 
@@ -126,7 +126,7 @@ rm(.data)
     # val       The values to which a smoothed spline is fitted
     # predind   The location for which the smoothed spline function
     #           is evaluated (0 - 1)
-    # smooth    the smoothing as "spar" in smooth.spline
+    # smooth    the smoothing as 'spar' in smooth.spline
     #
     # Author    jonas.bhend -at- gkss.de
     #
@@ -138,7 +138,7 @@ rm(.data)
     fitval
 }
 
-.colseq <- function(x, tmp, start=0, stop=1, log=F, smooth=0.4){
+.colseq <- function(x, tmp, start=0, stop=1, log=FALSE, smooth=0.4){
     # .colseq computes a color sequence of x rgb colors along the indicated
     # colors by tmp (Attention: 'ind' is set to .spacing to match the
     # colours provided by .bluewhite, etc.)
@@ -172,7 +172,7 @@ rm(.data)
     colour
 }
 
-rbfun <- function(x, start=0.4, log=F){
+rbfun <- function(x, start=0.4, log=FALSE){
     # rbfun computes a symmetric redblue color scale with x colors
     #
     # Arguments:
@@ -193,7 +193,7 @@ rbfun <- function(x, start=0.4, log=F){
     }
     colour
 }
-rbfuninv <- function(x, start=0.4, log=F){
+rbfuninv <- function(x, start=0.4, log=FALSE){
     # rbfun computes a symmetric redblue color scale with x colors
     #
     # Arguments:
@@ -215,7 +215,7 @@ rbfuninv <- function(x, start=0.4, log=F){
     colour
 }
 
-gbfun <- function(x, start=0.4, log=F){
+gbfun <- function(x, start=0.4, log=FALSE){
     # rbfun computes a symmetric greenbrown color scale with x colors
     #
     # Arguments:
@@ -237,5 +237,5 @@ gbfun <- function(x, start=0.4, log=F){
     colour
 }
 
-.soil   <- c("#E6FAFF","white", "grey", gbfun(6)[c(3:1,4:6)], .water)
+.soil   <- c('#E6FAFF','white', 'grey', gbfun(6)[c(3:1,4:6)], .water)
 

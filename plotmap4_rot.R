@@ -1,33 +1,33 @@
 `plotmap4_rot` <-
   function(file, file.small=NULL, sponge=8, sponge.small=15,
            varname = NULL, lsm.file=NULL, lsm.file.small=NULL,
-           col=NULL, levels=NULL, sea.col=NULL, rivers=T,
-           cities=T, label=TRUE, minpop=NULL, ncities=10, city.pch=19,
-           alt.contour=F, alt.lev=NULL,
+           col=NULL, levels=NULL, sea.col=NULL, rivers=TRUE,
+           cities=TRUE, label=TRUE, minpop=NULL, ncities=10, city.pch=19,
+           alt.contour=FALSE, alt.lev=NULL,
            grid=TRUE, grid.txt=TRUE, grid.lty=2,
            i.time=1, i.lev=1, map.lwd=2,
            cex.axis=1, cex.lab=1, cex.main=1, cex.txt=1,
-           main="", xlab="", ylab="", add=FALSE,
+           main='', xlab='', ylab='', add=FALSE,
            colourplot=TRUE, hires=FALSE, interior=FALSE, alt.poli=TRUE,
-           nlongrid=10, nlatgrid=5, lon.ind, lat.ind, myunits, myaxis="all",
-           projection="")
+           nlongrid=10, nlatgrid=5, lon.ind, lat.ind, myunits, myaxis='all',
+           projection='')
 {
 
   # load hi-resolution map-data only when hires is set
   # in order to avoid complications on a system without
   # the mapdata package
-  if (hires) library("mapdata")
+  if (hires) library('mapdata')
 
   # read in the data from file
   nc <- nc_open(file)
 
   # read in the coordinates of the rotated pole
   pollon  <- as.numeric(ncatt_get(nc, nc$var$rotated_pole,
-                                     "grid_north_pole_longitude")$value)
+                                     'grid_north_pole_longitude')$value)
   pollat  <- as.numeric(ncatt_get(nc, nc$var$rotated_pole,
-                                     "grid_north_pole_latitude")$value)
+                                     'grid_north_pole_latitude')$value)
   polgam  <- ncatt_get(nc, nc$var$rotated_pole,
-                          "north_pole_grid_longitude")
+                          'north_pole_grid_longitude')
   if (polgam$hasatt){
     polgam <- polgam$value
   } else {
@@ -40,10 +40,10 @@
 
   # find the variable name (if not set)
   if (is.null(varname)){
-    noread  <- c("lon", "lat")
+    noread  <- c('lon', 'lat')
     var.n   <- setdiff(names(nc$var), noread)
-    if (any(var.n == "HSURF")){
-      varname <- "HSURF"
+    if (any(var.n == 'HSURF')){
+      varname <- 'HSURF'
     } else {
       dims    <- lapply(nc$var[names(nc$var) %in% var.n], function(x) x$size)
       which.v <- sapply(dims, function(x) all(x[1:2] == c(nlon, nlat)))
@@ -60,9 +60,9 @@
 
 
   # read in unrotated coordinates
-  if (any(names(nc$var) %in% c("lon", "lat"))){
-    lon <- ncvar_get(nc, "lon")
-    lat <- ncvar_get(nc, "lat")
+  if (any(names(nc$var) %in% c('lon', 'lat'))){
+    lon <- ncvar_get(nc, 'lon')
+    lat <- ncvar_get(nc, 'lat')
   } else {
     tmp <- rot2geo(pollon, pollat, rep(rlon, nlat), rep(rlat, each=nlon), polgam)
     lon <- array(tmp$x, c(nlon,nlat))
@@ -71,20 +71,20 @@
 
   # store information on variables
   longname    <- nc$var[[varname]]$longname
-  if ( myunits == "" ) {
+  if ( myunits == '' ) {
     units       <- nc$var[[varname]]$units
   } else { units <- myunits }
   flag_values <- ncatt_get(nc, nc$var[[varname]],
-                              "flag_values")
+                              'flag_values')
   if (flag_values$hasatt){
     flag_values <- flag_values$value
   } else {
     flag_values <- NULL
   }
   flag_meanings <- ncatt_get(nc, nc$var[[varname]],
-                                "flag_meanings")
+                                'flag_meanings')
   if (flag_meanings$hasatt){
-    flag_meanings <- unlist(strsplit(flag_meanings$value, " "))
+    flag_meanings <- unlist(strsplit(flag_meanings$value, ' '))
   } else {
     flag_meanings <- NULL
   }
@@ -98,7 +98,7 @@
   }
 
   # if HSURF is plotted, the lsm.file is the same as file
-  if (varname == "HSURF"){
+  if (varname == 'HSURF'){
     lsm.file    <- file
     if (!is.null(file.small)){
       lsm.file.small  <- file.small
@@ -111,18 +111,18 @@
     alt.contour <- FALSE
   } else {
     nc.lsm  <- nc_open(lsm.file)
-    lsm     <- ncvar_get(nc.lsm, "FR_LAND")
+    lsm     <- ncvar_get(nc.lsm, 'FR_LAND')
     lsm     <- lsm > 0.5
-    if (any(names(nc.lsm$var) %in% c("lon", "lat"))){
-      lon <- ncvar_get(nc.lsm, "lon")
-      lat <- ncvar_get(nc.lsm, "lat")
+    if (any(names(nc.lsm$var) %in% c('lon', 'lat'))){
+      lon <- ncvar_get(nc.lsm, 'lon')
+      lat <- ncvar_get(nc.lsm, 'lat')
     } else {
       tmp <- rot2geo(pollon, pollat, rep(rlon, nlat), rep(rlat, each=nlon), polgam)
       lon <- array(tmp$x, c(nlon,nlat))
       lat <- array(tmp$y, c(nlon,nlat))
     }
-    if (alt.contour & any(names(nc.lsm$var) == "FR_LAND")){
-      alt <- ncvar_get(nc.lsm, "FR_LAND")
+    if (alt.contour & any(names(nc.lsm$var) == 'FR_LAND')){
+      alt <- ncvar_get(nc.lsm, 'FR_LAND')
     }
     nc_close(nc.lsm)
   }
@@ -157,10 +157,10 @@
       lsm.small     <- array(TRUE, dim(data.small))
     } else {
       nc.lsm.small  <- nc_open(lsm.file.small)
-      lsm.small     <- ncvar_get(nc.lsm.small, "FR_LAND")
+      lsm.small     <- ncvar_get(nc.lsm.small, 'FR_LAND')
       lsm.small     <- lsm.small > 0.5
-      if (alt.contour & any(names(nc.lsm.small$var) == "FR_LAND")){
-        alt.small <- ncvar_get(nc.lsm, "FR_LAND")
+      if (alt.contour & any(names(nc.lsm.small$var) == 'FR_LAND')){
+        alt.small <- ncvar_get(nc.lsm, 'FR_LAND')
       }
       nc_close(nc.lsm.small)
     }
@@ -168,11 +168,11 @@
 
   # set levels
   if (is.null(levels)){
-    if (varname == "HSURF"){
+    if (varname == 'HSURF'){
       levs <- c(-200,0,100,200,500,1000,1500,2000,3000,10000)
     } else {
       if (is.null(flag_values)){
-        if (exists("data.small")){
+        if (exists('data.small')){
           levs    <- pretty(c(data, data.small), 20)
         } else {
           levs    <- pretty(data, 20)
@@ -191,32 +191,32 @@
   ncols <- length(levs)-1
   if (is.null(col)){
     if (colourplot){
-      if (varname == "HSURF"){
+      if (varname == 'HSURF'){
         colours <- .colseq(length(levs)-1, .hsurf, smooth=0)
         sea.col <- .water
-      } else if (varname == "SOILTYP"){
+      } else if (varname == 'SOILTYP'){
         colours <- .soil[flag_values+1]
-      } else if (varname %in% c("TOT_PREC", "precip", "pr", "TOT_PREC_PCTL")){
+      } else if (varname %in% c('TOT_PREC', 'precip', 'pr', 'TOT_PREC_PCTL')){
         colours <- .colseq(length(levs)-1, .gpcc, smooth=0)
-      } else if (varname == "TOT_PREC_BIAS"){
+      } else if (varname == 'TOT_PREC_BIAS'){
         colours     <- rbfuninv(ncols)
       } else {
         colours     <- rbfun(ncols)
       }
     } else {
       colours <- grey((ncols+1):1/(ncols+1))[2:(ncols+1)]
-      sea.col <- "white"
+      sea.col <- 'white'
     }
   } else {
     colours <- rep(col, length.out=ncols)
   }
 
   if (hires){
-    worlddb <- "worldHires"
-    if (any(lon > 180)) worlddb <- "worldHires2"
+    worlddb <- 'worldHires'
+    if (any(lon > 180)) worlddb <- 'worldHires2'
   } else {
-    worlddb <- "world"
-    if (any(lon > 180)) worlddb <- "world2"
+    worlddb <- 'world'
+    if (any(lon > 180)) worlddb <- 'world2'
   }
   if (alt.poli & interior){
     data(polibound)
@@ -224,21 +224,21 @@
     if (any(lon > 180)){
       world$x[world$x < 0] <- world$x[world$x < 0] + 360
     }
-    for (add.name in c(".*Lake.*", ".*Sea.*")){
-      world.add <- try(map(worlddb, region=add.name, plot=F, xlim=range(lon), ylim=range(lat),projection="bonne"), silent=TRUE)
+    for (add.name in c('.*Lake.*', '.*Sea.*')){
+      world.add <- try(map(worlddb, region=add.name, plot=FALSE, xlim=range(lon), ylim=range(lat),projection='bonne'), silent=TRUE)
       if (class(world.add) != 'try-error' & length(world.add) > 0){
         world   <- list(x=c(world$x, NA, world.add$x),
                         y=c(world$y, NA, world.add$y))
       }
     }
   } else {
-    world       <- map(worlddb,interior=interior, plot=F,
+    world       <- map(worlddb,interior=interior, plot=FALSE,
                        xlim=range(lon), ylim=range(lat))
   }
   if (!interior){
     # remove Lesotho and add the Lakes and Seas
-    for (add.name in c(".*Lake.*", ".*Sea.*", ".*Island.*")){
-      world.add <- try(map(worlddb, region=add.name, plot=F,
+    for (add.name in c('.*Lake.*', '.*Sea.*', '.*Island.*')){
+      world.add <- try(map(worlddb, region=add.name, plot=FALSE,
                            xlim=range(lon), ylim=range(lat)), silent=TRUE)
       if (class(world.add) != 'try-error' & length(world.add) > 0){
         world   <- list(x=c(world$x, NA, world.add$x),
@@ -246,7 +246,7 @@
                         names=c(world$names, world.add$names))
       }
     }
-    world.remove<- map(worlddb, region="Lesotho", plot=F)
+    world.remove<- map(worlddb, region='Lesotho', plot=FALSE)
     ind.i       <- which(world$x %in% world.remove$x & world$y %in% world.remove$y)
     world$x[ind.i] <- NA
     world$y[ind.i] <- NA
@@ -254,14 +254,14 @@
   world.rot   <- geo2rot(pollon,pollat,world$x, world$y, polgam)
 
   if (rivers){
-    riv.dat     <- map('rivers', plot=F)
+    riv.dat     <- map('rivers', plot=FALSE)
     rivers.rot  <- geo2rot(pollon,pollat, riv.dat$x, riv.dat$y, polgam)
   }
 
   data.tmp      <- data
   data.tmp[!lsm]  <- NA
   image(rlon, rlat, data.tmp, breaks=levs, add=add,
-        col=colours, axes=F, xlab=xlab, ylab=ylab, main=main,
+        col=colours, axes=FALSE, xlab=xlab, ylab=ylab, main=main,
         cex.axis=cex.axis, cex.lab=cex.lab, cex.main=cex.main)
 
   if (any(!lsm) & !is.null(sea.col)){
@@ -269,51 +269,51 @@
     data.tmp  <- data
     data.tmp[lsm]   <- NA
     image(rlon, rlat, data.tmp, breaks=c(-1e10,1e10),
-          col=sea.col, add=T, axes=F, xlab="", ylab="")
+          col=sea.col, add=TRUE, axes=FALSE, xlab='', ylab='')
   }
 
-  if (exists("alt")){
+  if (exists('alt')){
     if (is.null(alt.lev)) alt.lev <- pretty(alt, 10)
-    contour(rlon, rlat, alt, lev=alt.lev, drawlabels=F, add=T)
+    contour(rlon, rlat, alt, lev=alt.lev, drawlabels=FALSE, add=TRUE)
   }
 
   if (!is.null(file.small)){
 
     # make sponge zone transparent if dev == pdf, otherwise white
-    if (!is.null(names(dev.cur())) & names(dev.cur()) == "pdf"){
+    if (!is.null(names(dev.cur())) & names(dev.cur()) == 'pdf'){
       rect(min(rlon.small), min(rlat.small), max(rlon.small), max(rlat.small),
            border=1, lwd=1, col=rgb(1,1,1,0.5))
     } else {
       rect(min(rlon.small), min(rlat.small), max(rlon.small), max(rlat.small),
-           border=1, lwd=1, col="white")
+           border=1, lwd=1, col='white')
     }
 
     data.small.tmp  <- data.small
 
     data.small.tmp[!lsm.small] <- NA
     image(rlon.small, rlat.small, data.small.tmp, breaks=levs,
-          col=colours,  add=T, axes=F, xlab="", ylab="")
+          col=colours,  add=TRUE, axes=FALSE, xlab='', ylab='')
 
     if (any(!lsm.small) & !is.null(sea.col)){
       data.small.tmp          <- data.small
       data.small.tmp[lsm.small]   <- NA
       image(rlon.small, rlat.small, data.small.tmp, breaks=c(-1e10,1e10),
-            col=sea.col, add=T, axes=F, xlab="", ylab="")
+            col=sea.col, add=TRUE, axes=FALSE, xlab='', ylab='')
     }
 
-    if (exists("alt.small")){
+    if (exists('alt.small')){
       if (is.null(alt.lev)) alt.lev <- pretty(alt.small, 10)
-      contour(rlon.small, rlat.small, alt.small, lev=alt.lev, drawlabels=F, add=T)
+      contour(rlon.small, rlat.small, alt.small, lev=alt.lev, drawlabels=FALSE, add=TRUE)
     }
   }
 
   if (rivers){
     riv.col <- sea.col
-    if (is.null(riv.col)) riv.col <- "white"
+    if (is.null(riv.col)) riv.col <- 'white'
     lines(rivers.rot$x, rivers.rot$y, col=riv.col)
   }
 
-  if (!exists("alt")){
+  if (!exists('alt')){
     ##lon-lat-lines
     lines(world.rot$x, world.rot$y, lwd=map.lwd)
   }
@@ -354,7 +354,7 @@
   box(lwd=1)
 
   # check whether lon and lat are present, else set grid to FALSE
-  if (!(exists("lon") & exists("lat"))){
+  if (!(exists('lon') & exists('lat'))){
     grid    <- FALSE
   }
 
@@ -368,9 +368,9 @@
     }
 
     contour(rlon, rlat, lon, levels=lon.ind,
-            lty=grid.lty, drawlabels=F, axes=F, add=T)
+            lty=grid.lty, drawlabels=FALSE, axes=FALSE, add=TRUE)
     contour(rlon, rlat, lat, levels=lat.ind,
-            lty=grid.lty, drawlabels=F, axes=F, add=T)
+            lty=grid.lty, drawlabels=FALSE, axes=FALSE, add=TRUE)
 
     if (grid.txt){
       lon.ind2 <- lon.ind
@@ -386,9 +386,9 @@
         dist <- lon.at[i] - lon.at[lo.i]
         if (dist < 0.6*(lab.w[i] + lab.w[lo.i])) lon.at[i] <- NA
       }
-      if ( myaxis == "" | myaxis == "all") {
-        axis(1, at=lon.at, labels=parse(text=lon.txt), tick=F, line=-0.5, cex.axis=cex.axis)
-      } else if (myaxis == "none" ) NA
+      if ( myaxis == '' | myaxis == 'all') {
+        axis(1, at=lon.at, labels=parse(text=lon.txt), tick=FALSE, line=-0.5, cex.axis=cex.axis)
+      } else if (myaxis == 'none' ) NA
 
       # top axis
       lon.i <- apply(as.matrix(lon.ind), 1, function(x) if (x > min(lon[,ncol(lon)]) & x < max(lon[,ncol(lon)])) which.min((lon[,ncol(lon)]-x)**2) else NA)
@@ -398,9 +398,9 @@
         dist <- lon.at[i] - lon.at[lo.i]
         if (dist < 0.6*(lab.w[i] + lab.w[lo.i])) lon.at[i] <- NA
       }
-      if ( myaxis == "" | myaxis == "all" | myaxis == "topleft" | myaxis == "topright" | myaxis == "topleftright" ) {
-        axis(3, at=lon.at, labels=parse(text=lon.txt), tick=F, line=-0.5, cex.axis=cex.axis)
-      } else if (myaxis == "none" ) NA
+      if ( myaxis == '' | myaxis == 'all' | myaxis == 'topleft' | myaxis == 'topright' | myaxis == 'topleftright' ) {
+        axis(3, at=lon.at, labels=parse(text=lon.txt), tick=FALSE, line=-0.5, cex.axis=cex.axis)
+      } else if (myaxis == 'none' ) NA
 
       lat.txt <- paste(lat.ind, '*degree')
       lab.w <- strheight(parse(text=lat.txt), cex=cex.axis)
@@ -413,9 +413,9 @@
         dist <- lat.at[i] - lat.at[lo.i]
         if (dist < (lab.w[i] + lab.w[lo.i])) lat.at[i] <- NA
       }
-      if ( myaxis == "" | myaxis == "all" | myaxis == "topleft" | myaxis == "topleftright" ) {
-        axis(2, at=lat.at, labels=parse(text=lat.txt), tick=F, line=-0.5, cex.axis=cex.axis, las=1)
-      } else if (myaxis == "none" ) NA
+      if ( myaxis == '' | myaxis == 'all' | myaxis == 'topleft' | myaxis == 'topleftright' ) {
+        axis(2, at=lat.at, labels=parse(text=lat.txt), tick=FALSE, line=-0.5, cex.axis=cex.axis, las=1)
+      } else if (myaxis == 'none' ) NA
 
       # right axis
       lat.i <- apply(as.matrix(lat.ind), 1, function(x) if (x > min(lat[nrow(lat),]) & x < max(lat[nrow(lat),])) which.min((lat[nrow(lat),]-x)**2) else NA)
@@ -425,9 +425,9 @@
         dist <- lat.at[i] - lat.at[lo.i]
         if (dist < (lab.w[i] + lab.w[lo.i])) lat.at[i] <- NA
       }
-      if ( myaxis == "" | myaxis == "all" | myaxis == "topright" | myaxis == "topleftright" ) {
-        axis(4, at=lat.at, labels=parse(text=lat.txt), tick=F, line=-0.5, cex.axis=cex.axis, las=1)
-      } else if (myaxis == "none" ) NA
+      if ( myaxis == '' | myaxis == 'all' | myaxis == 'topright' | myaxis == 'topleftright' ) {
+        axis(4, at=lat.at, labels=parse(text=lat.txt), tick=FALSE, line=-0.5, cex.axis=cex.axis, las=1)
+      } else if (myaxis == 'none' ) NA
     }
   }
 
@@ -436,7 +436,7 @@
   out         <- list(pollon=pollon, pollat=pollat, polgam=polgam,
                       col=colours, lev=levs, sea.col=sea.col, flag_values=flag_values,
                       flag_meanings=flag_meanings, longname=longname, units=units)
-  class(out)  <- "plotmap"
+  class(out)  <- 'plotmap'
   invisible(out)
 
 }
