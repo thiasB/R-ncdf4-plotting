@@ -8,7 +8,8 @@
            i.time=1, i.lev=1, map.lwd=1.0, box.outer=TRUE,
            cex.axis=1, cex.lab=1, cex.main=2, xlim=NULL, ylim=NULL,
            main='', xlab='', ylab='', add=FALSE,
-           colourplot=TRUE, hires=TRUE, interior=FALSE,alt.poli=TRUE,signif.poli=TRUE,
+           colourplot=TRUE, hires=TRUE, interior=FALSE,
+           alt.poli=TRUE, signif.poli=TRUE,
            nlongrid=10, nlatgrid=5, lon.ind, lat.ind, myunits, myaxis='all',
            projection=NULL)
 {
@@ -50,29 +51,6 @@
       varname <- names(which.v)[which.max(which.v)]
     }
   }
-
-
-  #  var      <- nc$var[]
-  #  print(var)
-  #  varsize <- v3$varsize
-  #  ndims   <- v3$ndims
-  #  nt      <- varsize[ndims]  # Remember timelike dim is always the LAST dimension!
-
-  ##   for( i in 1:nt ) {
-  ##     # Initialize start and count to read one timestep of the variable.
-  ##     start <- rep(1,ndims)   # begin with start=(1,1,1,...,1)
-  ##     start[ndims] <- i       # change to start=(1,1,1,...,i) to read timestep i
-  ##     count <- varsize        # begin w/count=(nx,ny,nz,...,nt), reads entire var
-  ##     count[ndims] <- 1       # change to count=(nx,ny,nz,...,1) to read 1 tstep
-  ##     datatmp <- ncvar_get( nc, var, start=start, count=count )
-
-  ##     # Now read in the value of the timelike dimension
-  ##     timeval <- ncvar_get( nc, var$dim[[ndims]]$name, start=i, count=1 )
-
-  ##     print(paste('Data for variable',var$name,'at timestep',i,
-  ##                 ' (time value=',timeval,var$dim[[ndims]]$units,'):'))
-  ## #    print(data3)
-  ##   }
 
   data    <- ncvar_get(nc, varname)
 
@@ -310,7 +288,7 @@
     if (is.null(signif.lev)) signif.lev <- pretty(signif, 1)
     #    filled.contour(lon, lat, signif, lev=signif.lev, drawlabels=FALSE, add=TRUE, col='green')
     sigcols <- c(rgb(0,0,0,signif.transp,maxColorValue=255),
-              rgb(255,255,255,0,maxColorValue=255))
+                 rgb(255,255,255,0,maxColorValue=255))
     image(lon,lat,signif, col=sigcols,breaks=c(-1,0,1), axes=FALSE,add=TRUE)
   }
 
@@ -420,11 +398,9 @@
     }
   }
 
-
   ## pollon, pollat
   out <- list(col=colours, lev=levs, sea.col=sea.col, flag_values=flag_values,
               flag_meanings=flag_meanings, longname=longname, units=units)
   class(out) <- 'plotmap'
   invisible(out)
 }
-
