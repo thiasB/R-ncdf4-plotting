@@ -215,6 +215,13 @@
   }
 
 
+  if (is.null(xlim)) {
+    xlim <- range(lon)
+  }
+  if (is.null(ylim)) {
+    ylim <- range(lat)
+  }
+
   if (hires){
     worlddb <- 'worldHires'
     if (any(lon > 180)) worlddb <- 'worldHires2'
@@ -229,7 +236,7 @@
       world$x[world$x < 0] <- world$x[world$x < 0] + 180
     }
     for (add.name in c('.*Lake.*', '.*Sea.*')){
-      world.add <- try(map(worlddb, region=add.name, plot=FALSE, xlim=range(lon), ylim=range(lat)), silent=TRUE)
+      world.add <- try(map(worlddb, region=add.name, plot=FALSE, xlim=xlim, ylim=ylim), silent=TRUE)
       if (class(world.add) != 'try-error' & length(world.add) > 0){
         world   <- list(x=c(world$x, NA, world.add$x),
                         y=c(world$y, NA, world.add$y))
@@ -238,12 +245,12 @@
 
   } else {
     world       <- map(worlddb,interior=interior, plot=FALSE,
-                       xlim=range(lon), ylim=range(lat))
+                       xlim=xlim, ylim=ylim)
   }
   if (!interior){
     # remove Lesotho and add the Lakes and Seas
     for (add.name in c('.*Lake.*', '.*Sea.*', '.*Island.*')){
-      world.add <- try(map(worlddb, region=add.name, plot=FALSE, xlim=range(lon), ylim=range(lat)), silent=TRUE)
+      world.add <- try(map(worlddb, region=add.name, plot=FALSE, xlim=xlim, ylim=ylim), silent=TRUE)
       if (class(world.add) != 'try-error' & length(world.add) > 0){
         world   <- list(x=c(world$x, NA, world.add$x),
                         y=c(world$y, NA, world.add$y),
@@ -267,15 +274,16 @@
   data.tmp[!lsm]  <- NA
   image(lon, lat, data.tmp, breaks=levs, axes=FALSE, add=add,
         col=colours, main=main, xlab=xlab, ylab=ylab,
-        cex.axis=cex.axis, cex.lab=cex.lab, cex.main=cex.main)
-
+        cex.axis=cex.axis, cex.lab=cex.lab, cex.main=cex.main,
+        xlim=xlim, ylim=ylim)
 
   if (any(!lsm) & !is.null(sea.col)){
     ## sea points with sea.col
     data.tmp  <- data
     data.tmp[lsm]   <- NA
     image(lon, lat, data.tmp, breaks=c(-1e10,1e10),
-          col=sea.col, add=TRUE, axes=FALSE, xlab='', ylab='')
+          col=sea.col, add=TRUE, axes=FALSE, xlab='', ylab='',
+          xlim=xlim, ylim=ylim)
   }
 
   if (exists('alt')){
@@ -289,7 +297,9 @@
     #    filled.contour(lon, lat, signif, lev=signif.lev, drawlabels=FALSE, add=TRUE, col='green')
     sigcols <- c(rgb(0,0,0,signif.transp,maxColorValue=255),
                  rgb(255,255,255,0,maxColorValue=255))
-    image(lon,lat,signif, col=sigcols,breaks=c(-1,0,1), axes=FALSE,add=TRUE)
+    image(lon,lat,signif, col=sigcols,breaks=c(-1,0,1), axes=FALSE,add=TRUE,
+          xlim=xlim, ylim=ylim)
+
   }
 
   if (!is.null(file.small)){
