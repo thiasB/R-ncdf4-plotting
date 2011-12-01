@@ -203,6 +203,8 @@
         colours <- .colseq(length(levs)-1, .cordex_t2m, smooth=0)
       } else if (varname %in% c('T_2M_DIFF')){
         colours <- .colseq(length(levs)-1, .cordex_t2m_diff, smooth=0)
+      } else if (varname %in% c('T_2M_DIFF_UNI')){
+        colours <- .colseq(length(levs)-1, .cordex_t2m_diff_uni, smooth=0)
       } else {
         colours     <- rbfun(ncols)
       }
